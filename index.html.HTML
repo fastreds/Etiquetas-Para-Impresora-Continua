@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Etiquetas con Temática</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Pacifico&family=Roboto&family=Sacramento&family=Lobster&family=Courgette&family=Rock+Salt&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            font-size: 24px;
+            color: #2E8B57;
+        }
+        .textarea-container {
+            margin: 20px 0;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            font-size: 18px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #2E8B57;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #1C6A42;
+        }
+        .controls {
+            margin-top: 20px;
+        }
+        .controls select, .controls input {
+            margin: 10px;
+            padding: 8px;
+            font-size: 16px;
+        }
+        .label-container {
+            margin-top: 30px;
+        }
+        .label {
+            width: 10cm;
+            height: 3cm;
+            border: 1px solid #000;
+            margin: 10px auto;
+            padding: 10px;
+            text-align: center;
+            font-family: 'Great Vibes', cursive;
+            font-size: 36px;
+            line-height: 2.5cm;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon {
+            font-size: 40px;
+            color: #2E8B57;
+            margin-right: 10px;
+        }
+        .label-text {
+            display: inline-block;
+            line-height: 1.2em;
+        }
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .label {
+                page-break-before: always;
+                page-break-after: always;
+            }
+            button, .textarea-container, .controls {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Generador de Etiquetas con Temática</h1>
+    <div class="textarea-container">
+        <textarea id="namesInput" placeholder="Escribe los nombres separados por comas. Usa '/' para saltar a una nueva línea..."></textarea>
+    </div>
+
+    <div class="controls">
+        <label for="fontSelect">Seleccionar tipo de fuente:</label>
+        <select id="fontSelect">
+            <option value="Great Vibes">Great Vibes</option>
+            <option value="Pacifico">Pacifico</option>
+            <option value="Roboto">Roboto</option>
+            <option value="Sacramento">Sacramento</option>
+            <option value="Lobster">Lobster</option>
+            <option value="Courgette">Courgette</option>
+            <option value="Rock Salt">Rock Salt</option>
+        </select>
+
+        <label for="fontSize">Tamaño de fuente:</label>
+        <input type="range" id="fontSize" min="16" max="80" value="36">
+
+        <label for="themeSelect">Seleccionar temática:</label>
+        <select id="themeSelect">
+            <option value="navidad">Navideños</option>
+            <option value="escolar">Escolares</option>
+            <option value="deportes">Deportes</option>
+            <option value="emergencias">Emergencias</option>
+            <option value="medicina">Medicina</option>
+            <option value="informatica">Informática</option>
+            <option value="oficina">Oficina</option>
+            <option value="otros">Otros</option>
+        </select>
+    </div>
+
+    <button onclick="generateLabels()">Generar Etiquetas</button>
+
+    <div class="label-container" id="labelsContainer">
+        <!-- Las etiquetas generadas aparecerán aquí -->
+    </div>
+
+    <script>
+        const iconThemes = {
+            navidad: ['fa-tree', 'fa-snowflake', 'fa-gift', 'fa-santa-hat', 'fa-bell', 'fa-star', 'fa-candy-cane', 'fa-winter', 'fa-socks', 'fa-glass-cheers'],
+            escolar: ['fa-book', 'fa-pencil-alt', 'fa-ruler', 'fa-chalkboard-teacher', 'fa-school', 'fa-apple-alt', 'fa-backpack', 'fa-graduation-cap', 'fa-pencil', 'fa-laptop'],
+            deportes: ['fa-football-ball', 'fa-basketball-ball', 'fa-baseball-ball', 'fa-volleyball-ball', 'fa-running', 'fa-futbol', 'fa-bicycle', 'fa-swimmer', 'fa-table-tennis', 'fa-skiing'],
+            emergencias: ['fa-ambulance', 'fa-heartbeat', 'fa-medkit', 'fa-hospital', 'fa-user-md', 'fa-first-aid', 'fa-lungs', 'fa-stethoscope', 'fa-syringe', 'fa-pills'],
+            medicina: ['fa-heart', 'fa-stethoscope', 'fa-hospital', 'fa-user-md', 'fa-pills', 'fa-mortar-pestle', 'fa-syringe', 'fa-brain', 'fa-bone', 'fa-flask'],
+            informatica: ['fa-laptop', 'fa-desktop', 'fa-tablet-alt', 'fa-mobile-alt', 'fa-hdd', 'fa-cloud', 'fa-wifi', 'fa-cogs', 'fa-server', 'fa-code'],
+            oficina: ['fa-briefcase', 'fa-cogs', 'fa-calendar', 'fa-pencil-alt', 'fa-paperclip', 'fa-folder', 'fa-copy', 'fa-file-alt', 'fa-business-time', 'fa-chart-line'],
+            otros: ['fa-globe', 'fa-lightbulb', 'fa-palette', 'fa-magic', 'fa-cogs', 'fa-bolt', 'fa-bullhorn', 'fa-gift', 'fa-fire', 'fa-leaf']
+        };
+
+        function getRandomIcon() {
+            const theme = document.getElementById('themeSelect').value;
+            const icons = iconThemes[theme];
+            const randomIndex = Math.floor(Math.random() * icons.length);
+            return icons[randomIndex];
+        }
+
+        function generateLabels() {
+            const input = document.getElementById('namesInput').value.trim();
+            const names = input.split(',').map(name => name.trim()).filter(name => name !== '');
+            const labelsContainer = document.getElementById('labelsContainer');
+            const selectedFont = document.getElementById('fontSelect').value;
+            const fontSize = document.getElementById('fontSize').value;
+            labelsContainer.innerHTML = '';  // Limpiar etiquetas previas
+
+            names.forEach(name => {
+                // Dividir en líneas si contiene '/'
+                const lines = name.split('/').map(line => line.trim());
+                
+                const label = document.createElement('div');
+                label.classList.add('label');
+                label.style.fontFamily = selectedFont;
+                label.style.fontSize = fontSize + 'px';
+
+                // Crear el icono aleatorio
+                const icon = document.createElement('div');
+                icon.classList.add('icon', `fas`, getRandomIcon());
+
+                // Crear el texto
+                const labelText = document.createElement('div');
+                labelText.classList.add('label-text');
+                lines.forEach(line => {
+                    const lineElement = document.createElement('div');
+                    lineElement.textContent = line;
+                    labelText.appendChild(lineElement);
+                });
+
+                // Añadir el icono y el texto al label
+                label.appendChild(icon);
+                label.appendChild(labelText);
+                labelsContainer.appendChild(label);
+            });
+        }
+    </script>
+</body>
+</html>
